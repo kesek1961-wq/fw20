@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FW20">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAACP0lEQVR4nO3dsU3DUBRA0QQxAiuExULHCNSMQMdkZIQwBE2KYHHTRPj/KOd0llL84urpKbbs7W5/3MBfHkYfgHmJgyQOkjhI4iCJgyQOkjhI4iCJgyQOkjhI4iCJgyQOkjhI4iCJgyQOkjhI4iCJgyQOkjhIj6MPwC+7t4/zy8P766iTbEwOLhAHSRwkcZAspCdTbYKTMDlI4iCJgyQOkoV0bYvN95of//fWbHKQxEESB0kcpPEL6dfn0/nl88v3qJOwYHKQxEESB0kcpPEL6Wpu6K/JSZgcJHGQxEESB0kcJHGQxEESB0kcJHGQxEESB0kcJHGQ1rhlv3hK9Jofe8J0TSYHSRwkcZDEQRIHSRwkcZDEQRIHSRwkcZDEQRIHSRwkcZDEQRIHSRwkcZDEQbqjd4JN4vL7xKb6mpjJQRIHSRwkcZDEQRIHSRwkcZDEQRIHSRwkcZDEQRIH6Y5u2d/QvfJJmBwkcZDEQRIH6Y4W0psw1SJscpDEQRIHSRwkcZDEQRIHSRwkcZDEQRIHSRwkcZDEQVrjlv3lj8EuPiTry7HzMDlI4iCJgyQOkmdIT6Z6eHMSJgdJHCRxkMRBEgdJHCRxkMRBEgdJHCRxkMRBEgdJHCRxkMRBEgdJHCRxkLa7/XH0GZiUyUESB0kcJHGQxEESB0kcJHGQxEESB0kcJHGQxEESB0kcJHGQxEESB0kcJHGQxEESB0kcJHGQxEESB0kcJHGQxEESB0kcJHGQxEESB0kcJHGQxEESB+kHwxAr+TXcFUYAAAAASUVORK5CYII=">
+<meta name="theme-color" content="#2563eb">
+<title>FW20 Sygnały</title>
+<style>
+:root{--bg:#fff;--fg:#111;--card:#f3f4f6;--ok:#0a7d3b;--no:#b00020;--ac:#2563eb;--mut:#666}
+@media(prefers-color-scheme:dark){:root{--bg:#111;--fg:#eee;--card:#222;--ok:#4ade80;--no:#f87171;--ac:#60a5fa;--mut:#aaa}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,system-ui,sans-serif;max-width:560px;margin:0 auto;
+padding:calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 20px)}
+h1{font-size:20px;margin:0 0 10px;display:flex;justify-content:space-between;align-items:center}
+h2{font-size:16px;margin:18px 0 0}
+.gear{background:none;border:0;font-size:22px;color:var(--fg)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.st{background:var(--card);border-radius:12px;padding:10px 6px;text-align:center}.st b{display:block;font-size:20px}.st span{font-size:11px;color:var(--mut)}
+.btn{display:block;width:100%;font-size:18px;padding:14px;border:0;border-radius:12px;background:var(--ac);color:#fff;margin:10px 0}
+.btn:disabled{opacity:.5}.oc{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.oc button{flex:1 1 40%;font-size:14px;padding:9px 4px;border:0;border-radius:10px;background:var(--bg);color:var(--fg)}
+.lp{display:flex;gap:6px;margin-top:8px}.lp input{flex:2;margin:0}.lp button{flex:1;border:0;border-radius:10px;background:var(--ac);color:#fff;font-size:15px}
+.btn.sec{background:var(--card);color:var(--fg);font-size:15px;padding:10px}
+.card{background:var(--card);border-radius:12px;padding:12px;margin-top:10px}
+.sig{font-weight:700;font-size:18px}.ok{color:var(--ok)}.no{color:var(--no)}.mut{color:var(--mut);font-size:13px}
+.row{display:flex;justify-content:space-between;font-size:14px;padding:2px 0}.row b{font-weight:600}
+img{width:100%;border-radius:10px;margin-top:8px}
+summary{color:var(--ac);font-size:14px;margin-top:6px}
+input[type=text],input[type=password]{width:100%;font-size:16px;padding:10px;border-radius:10px;border:1px solid #8884;background:var(--bg);color:var(--fg);margin:4px 0 10px}
+label{font-size:13px;color:var(--mut)}
+#settings{display:none}
+</style></head><body>
+<h1><span>📊 FW20 – sygnały</span><button class="gear" id="gear" aria-label="Ustawienia">⚙️</button></h1>
+
+<div id="settings" class="card">
+ <label>Klucz API Anthropic (zapisany tylko w tej przeglądarce)</label>
+ <input type="password" id="k_api" placeholder="sk-ant-...">
+ <label>Telegram bot token (opcjonalnie)</label>
+ <input type="password" id="k_tg">
+ <label>Telegram chat ID (opcjonalnie)</label>
+ <input type="text" id="k_chat" inputmode="numeric">
+ <label>Mnożnik kontraktu (zł za punkt; FW20 zwykle 20, sprawdź u brokera)</label>
+ <input type="text" id="k_mult" inputmode="decimal">
+ <label>Liczba kontraktów</label>
+ <input type="text" id="k_ctr" inputmode="decimal">
+ <button class="btn" id="save">Zapisz</button>
+ <button class="btn sec" id="clear">Wyczyść historię</button>
+ <p class="mut">Ustaw limit wydatków na koncie API. Nie wklejaj klucza na cudzym urządzeniu.</p>
+</div>
+
+<div id="warn" class="card no" style="display:none"></div>
+<div class="grid" id="stats"></div>
+<input type="file" id="f" accept="image/*" multiple hidden>
+<input type="file" id="f2" accept="image/*" hidden>
+<button class="btn" id="pick">📷 Wybierz 1–2 screeny i analizuj</button>
+<div id="cur"></div>
+<h2>Wyniki</h2><div id="hist"></div>
+<p class="mut">Tryb 2 screenów: zaznacz wykres wyższego interwału (np. 1H) i niższego (np. 15m). Wyższy daje kierunek, niższy wejście.</p>
+<p class="mut">Analiza techniczna z obrazu, nie rekomendacja inwestycyjna. Sprawdzaj poziomy na żywym wykresie.</p>
+
+<script>
+const MODEL="claude-sonnet-4-6", MIN_RR=1.5, MAX_DAILY=2;
+const PROMPT=`Jesteś analitykiem technicznym kontraktów FW20 (WIG20). Na screenie jest wykres.
+Odczytaj: instrument, interwał, ostatnią cenę, poziomy z osi cen, strukturę (HH/HL lub LH/LL), wsparcia/opory, wolumen.
+Zaproponuj JEDEN sygnał albo BRAK. Poziomy MUSZĄ wynikać z cen widocznych na osi. Jeśli wykres jest nieczytelny, zwróć BRAK.
+Jeśli są DWA screeny: rozpoznaj interwały z opisów na wykresach. Wyższy interwał służy do określenia trendu i kluczowych poziomów (pole htf_trend), niższy do wejścia, SL i TP. Jeśli jest jeden screen, ustaw htf_trend na "brak".
+DOPASUJ analizę do interwału z wykresu, komentarz ma się wyraźnie różnić zależnie od interwału:
+- 15m: mikrostruktura, ostatnie szczyty/dołki, krótkoterminowe poziomy, ciasny SL/TP, horyzont: kilka godzin w ramach sesji.
+- 1H: struktura w skali dnia, poziomy z kilku sesji, szerszy SL/TP, horyzont: do końca dnia lub 1-2 dni.
+- 1D: struktura wielodniowa, główne wsparcia i opory, szeroki SL/TP, horyzont: kilka dni do tygodni.
+W reasoning podaj interwał, horyzont czasowy i skalę ruchu w punktach. Nie kopiuj schematu opisu między interwałami.
+Odpowiedz WYŁĄCZNIE JSON-em:
+{"htf_trend":"wzrostowy|spadkowy|boczny|brak","htf_note":"1 zdanie o wyższym interwale lub pusty","instrument":str,"interval":str,"last_price":number,"trend":"wzrostowy|spadkowy|boczny","signal":"LONG|SHORT|BRAK","setup":"pullback|breakout|brak","entry":number|null,"sl":number|null,"tp":number|null,"confidence":"niska|srednia|wysoka","reasoning":"max 3 zdania po polsku","invalidation":"po polsku"}`;
+const $=i=>document.getElementById(i);
+const esc=t=>{const d=document.createElement('div');d.textContent=t==null?'-':String(t);return d.innerHTML};
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+          set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
+
+function today(){return new Date().toISOString().slice(0,10)}
+function syncLog(){
+ // lekki, trwały log ważnych sygnałów (niezależny od historii z miniaturami)
+ const h=ls.get('hist',[]),log=ls.get('log',[]),known=new Set(log.map(x=>x.ts));let ch=false;
+ h.forEach(x=>{if(!x.valid)return;
+  if(!known.has(x.ts)){log.push({ts:x.ts,signal:x.signal,rr:Number(x.rr)||0,entry:+x.entry,sl:+x.sl,tp:+x.tp,outcome:x.outcome||undefined});ch=true}
+  else{const e=log.find(i=>i.ts===x.ts);if(e&&e.entry==null){e.entry=+x.entry;e.sl=+x.sl;e.tp=+x.tp;ch=true}}});
+ if(ch)ls.set('log',log);
+ return log;
+}
+function todayCount(){return syncLog().filter(x=>x.ts.startsWith(today())).length}
+
+async function loadImg(file){
+ if(window.createImageBitmap){try{return await createImageBitmap(file)}catch(e){}}
+ const url=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);
+  r.onerror=()=>rej(new Error('Nie udało się odczytać pliku.'));r.readAsDataURL(file)});
+ return await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);
+  i.onerror=()=>rej(new Error('Nie udało się otworzyć obrazu. Wybierz zrzut ekranu (PNG/JPG) ze Zdjęć.'));i.src=url});
+}
+async function resize(file,max,q){
+ const img=await loadImg(file);
+ const w=img.width,h=img.height,r=Math.min(1,max/Math.max(w,h));
+ const c=document.createElement('canvas');c.width=Math.round(w*r);c.height=Math.round(h*r);
+ c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+ if(img.close)img.close();
+ return c.toDataURL('image/jpeg',q);
+}
+
+async function analyze(b64s){
+ const key=ls.get('api','');if(!key)throw new Error('Wpisz klucz API w ustawieniach (⚙️).');
+ const content=[];
+ b64s.forEach((b,i)=>{if(b64s.length>1)content.push({type:'text',text:'Screen '+(i+1)+':'});
+  content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:b}})});
+ content.push({type:'text',text:PROMPT});
+ const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{
+  'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01',
+  'anthropic-dangerous-direct-browser-access':'true'},
+  body:JSON.stringify({model:MODEL,max_tokens:1100,messages:[{role:'user',content}]})});
+ const d=await r.json();
+ if(!r.ok)throw new Error(d.error?.message||('HTTP '+r.status));
+ const t=d.content.filter(b=>b.type==='text').map(b=>b.text).join('').replace(/```json|```/g,'').trim();
+ return JSON.parse(t);
+}
+
+function validate(s,h){
+ s.valid=false;s.rr=null;
+ if(!['LONG','SHORT'].includes(s.signal)){s.note='Brak sygnału.';return s}
+ const e=+s.entry,sl=+s.sl,tp=+s.tp;
+ if(!(e&&sl&&tp)){s.note='Niepełne poziomy.';return s}
+ const long=s.signal==='LONG';
+ if(long?!(sl<e&&e<tp):!(tp<e&&e<sl)){s.note='Niespójne poziomy SL/entry/TP.';return s}
+ if((s.htf_trend==='wzrostowy'&&!long)||(s.htf_trend==='spadkowy'&&long)){s.note='Sygnał przeciwny do trendu wyższego interwału ('+s.htf_trend+').';return s}
+ s.rr=+(Math.abs(tp-e)/Math.abs(e-sl)).toFixed(2);
+ if(s.rr<MIN_RR){s.note='RR '+s.rr+' poniżej minimum '+MIN_RR+'.';return s}
+ if(todayCount(h)>=MAX_DAILY){s.note='Dzienny limit '+MAX_DAILY+' sygnałów wyczerpany.';return s}
+ s.valid=true;s.note='OK';return s;
+}
+
+async function telegram(s){
+ const tok=ls.get('tg',''),chat=ls.get('chat','');if(!tok||!chat)return;
+ const txt=`📊 ${s.instrument} ${s.interval}\n${s.signal} (${s.setup}) | pewność: ${s.confidence}\nEntry ${s.entry}  SL ${s.sl}  TP ${s.tp}  RR ${s.rr}\n${s.htf_trend&&s.htf_trend!=='brak'?'Wyższy interwał: '+s.htf_trend+'\n':''}${s.reasoning}\nUnieważnia: ${s.invalidation}\n⚠️ Nie rekomendacja.`;
+ try{await fetch(`https://api.telegram.org/bot${tok}/sendMessage`,{method:'POST',headers:{'content-type':'application/json'},
+  body:JSON.stringify({chat_id:chat,text:txt})})}catch(e){}
+}
+
+const fmt=(v,d)=>(v>=0?'+':'')+v.toFixed(d);
+function calcPL(x,price){
+ const dir=x.signal==='LONG'?1:-1,risk=Math.abs(x.entry-x.sl);
+ if(!(risk>0)||!isFinite(price))return null;
+ const pts=(price-x.entry)*dir,R=pts/risk,pln=pts*ls.get('mult',20)*ls.get('ctr',1);
+ return {pts,R,pln,txt:`${fmt(pts,1)} pkt · ${fmt(R,2)}R · ${fmt(pln,0)} zł`};
+}
+function rOf(x){return x.outcome==='TP'?(Number(x.rr)||0):x.outcome==='SL'?-1:x.outcome==='MAN'?(Number(x.r)||0):null}
+function outcomeUI(s){
+ if(!s.valid)return '';
+ const x=(window.LG||{})[s.ts];if(!x)return '';
+ const L={TP:'✅ Trafiony TP',SL:'❌ Stop Loss',NO:'⏸ Bez wejścia'},o=x.outcome;
+ if(o==='OPEN'){
+  const p=x.lp!=null?calcPL(x,x.lp):null;
+  return `<div class="row"><span>Pozycja</span><b>🟢 otwarta, wejście ${esc(x.entry)}</b></div>
+  <div class="lp"><input type="number" inputmode="decimal" step="any" id="lp_${s.ts}" placeholder="Aktualna cena" value="${x.lp==null?'':x.lp}"><button onclick="setLive('${s.ts}')">Przelicz</button></div>
+  ${p?`<div class="row"><span>P/L live</span><b class="${p.pts>=0?'ok':'no'}">${p.txt}</b></div>`:''}
+  <div class="oc"><button onclick="pickPrice('${s.ts}')">📷 Cena ze screena</button><button onclick="closeAt('${s.ts}')">Zamknij po tej cenie</button><button onclick="setOutcome('${s.ts}','TP')">TP ✅</button><button onclick="setOutcome('${s.ts}','SL')">SL ❌</button><button onclick="setOutcome('${s.ts}',null)">Cofnij</button></div>`;
+ }
+ if(o==='MAN'){
+  const p=calcPL(x,x.exit);
+  return `<div class="row"><span>Wynik</span><b>Zamknięta po ${esc(x.exit)}</b></div>${p?`<div class="row"><span>P/L</span><b class="${p.pts>=0?'ok':'no'}">${p.txt}</b></div>`:''}<div class="oc"><button onclick="setOutcome('${s.ts}',null)">Zmień</button></div>`;
+ }
+ if(o)return `<div class="row"><span>Wynik</span><b>${L[o]}</b></div><div class="oc"><button onclick="setOutcome('${s.ts}',null)">Zmień</button></div>`;
+ return `<div class="oc"><button onclick="setOutcome('${s.ts}','OPEN')">Wszedłem 🟢</button><button onclick="setOutcome('${s.ts}','NO')">Bez wejścia</button><button onclick="setOutcome('${s.ts}','TP')">TP ✅</button><button onclick="setOutcome('${s.ts}','SL')">SL ❌</button></div>`;
+}
+function saveLog(log){
+ if(!ls.set('log',log)){alert('Nie udało się zapisać (pamięć przeglądarki pełna lub zablokowana).');return false}
+ $('cur').innerHTML='';renderAll();return true;
+}
+function setOutcome(ts,o){
+ const log=syncLog();const x=log.find(i=>i.ts===ts);if(!x)return;
+ if(o)x.outcome=o;else{delete x.outcome;delete x.lp;delete x.exit;delete x.r}
+ saveLog(log);
+}
+function readPrice(ts,x){
+ const el=document.getElementById('lp_'+ts);
+ const v=parseFloat(String(el?el.value:'').replace(',','.'));
+ return isFinite(v)?v:(x.lp!=null?x.lp:NaN);
+}
+function setLive(ts){
+ const log=syncLog();const x=log.find(i=>i.ts===ts);if(!x)return;
+ const v=readPrice(ts,x);if(!isFinite(v)){alert('Wpisz aktualną cenę.');return}
+ x.lp=v;saveLog(log);
+}
+async function readLastPrice(b64){
+ const key=ls.get('api','');if(!key)throw new Error('Wpisz klucz API w ustawieniach (⚙️).');
+ const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{
+  'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01',
+  'anthropic-dangerous-direct-browser-access':'true'},
+  body:JSON.stringify({model:MODEL,max_tokens:100,messages:[{role:'user',content:[
+   {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},
+   {type:'text',text:'Odczytaj z wykresu AKTUALNĄ (ostatnią) cenę instrumentu: z kolorowej etykiety ceny na osi albo z nagłówka wykresu. Odpowiedz WYŁĄCZNIE JSON-em: {"last_price":number|null,"instrument":string}. Jeśli nie widać ceny, zwróć null.'}]}]})});
+ const d=await r.json();
+ if(!r.ok)throw new Error(d.error?.message||('HTTP '+r.status));
+ const t=d.content.filter(b=>b.type==='text').map(b=>b.text).join('').replace(/```json|```/g,'').trim();
+ return JSON.parse(t);
+}
+function pickPrice(ts){
+ if(!ls.get('api','')){$('gear').click();return}
+ window.priceTs=ts;$('f2').click();
+}
+$('f2').onchange=async e=>{
+ const f=e.target.files[0];e.target.value='';if(!f||!window.priceTs)return;
+ const ts=window.priceTs;
+ $('cur').innerHTML='<div class="card">Odczytuję cenę…</div>';window.scrollTo({top:0,behavior:'smooth'});
+ try{
+  const b64=(await resize(f,1200,.8)).split(',')[1];
+  const d=await readLastPrice(b64);
+  const v=parseFloat(String(d.last_price).replace(',','.'));
+  if(!isFinite(v)){$('cur').innerHTML='<div class="card no">Nie widać ceny na screenie. Wpisz ją ręcznie.</div>';return}
+  const log=syncLog();const x=log.find(i=>i.ts===ts);if(!x)return;
+  x.lp=v;
+  if(saveLog(log))$('cur').innerHTML='<div class="card">Odczytano cenę <b>'+esc(v)+'</b>'+(d.instrument?' ('+esc(d.instrument)+')':'')+'. Sprawdź z wykresem.</div>';
+ }catch(err){$('cur').innerHTML='<div class="card no">'+esc(err&&err.message?err.message:'Nie udało się odczytać ceny.')+'</div>'}
+};
+function closeAt(ts){
+ const log=syncLog();const x=log.find(i=>i.ts===ts);if(!x)return;
+ const v=readPrice(ts,x);if(!isFinite(v)){alert('Wpisz cenę zamknięcia.');return}
+ const p=calcPL(x,v);if(!p){alert('Brak poziomów wejścia i SL.');return}
+ x.outcome='MAN';x.exit=v;x.r=+p.R.toFixed(2);delete x.lp;saveLog(log);
+}
+function card(s,open){
+ const c=s.valid?'ok':'no';
+ return `<div class="card"><div class="sig ${c}">${esc(s.signal)} <span class="mut">${esc(s.instrument)} ${esc(s.interval)} · ${esc((s.ts||'').replace('T',' ').slice(5,16))}</span></div>
+ <div class="${c} mut">${esc(s.note)}</div>
+ <div class="row"><span>Entry</span><b>${esc(s.entry)}</b></div><div class="row"><span>SL</span><b>${esc(s.sl)}</b></div>
+ <div class="row"><span>TP</span><b>${esc(s.tp)}</b></div><div class="row"><span>RR</span><b>${esc(s.rr)}</b></div>
+ <div class="row"><span>Pewność</span><b>${esc(s.confidence)}</b></div>
+ ${s.htf_trend&&s.htf_trend!=='brak'?`<div class="row"><span>Wyższy interwał</span><b>${esc(s.htf_trend)}</b></div><p class="mut">${esc(s.htf_note)}</p>`:''}
+ <p>${esc(s.reasoning)}</p><p class="mut">Unieważnia: ${esc(s.invalidation)}</p>
+ ${outcomeUI(s)}
+ ${(s.thumbs||(s.thumb?[s.thumb]:[])).length?`<details ${open?'open':''}><summary>Screen${(s.thumbs||[]).length>1?'y':''}</summary>${(s.thumbs||[s.thumb]).map(t=>`<img src="${t}" alt="">`).join('')}</details>`:''}</div>`}
+
+function renderAll(){
+ const log=syncLog();window.LG=Object.fromEntries(log.map(x=>[x.ts,x]));
+ const h=ls.get('hist',[]);
+ const closed=log.filter(x=>rOf(x)!==null),wins=closed.filter(x=>rOf(x)>0);
+ const eff=closed.length?Math.round(100*wins.length/closed.length)+'%':'–';
+ const sumR=closed.length?fmt(closed.reduce((a,x)=>a+rOf(x),0),2)+'R':'–';
+ const open=log.filter(x=>x.outcome==='OPEN'),live=open.map(x=>x.lp!=null?calcPL(x,x.lp):null).filter(Boolean);
+ const lR=live.length?fmt(live.reduce((a,p)=>a+p.R,0),2)+'R':'–',lZ=live.length?fmt(live.reduce((a,p)=>a+p.pln,0),0)+' zł':'–';
+ $('stats').innerHTML=[['Dziś',todayCount()+'/'+MAX_DAILY],['Skuteczność',eff],['Suma R',sumR],['Otwarte',open.length],['P/L live R',lR],['P/L live zł',lZ],['Ważne',log.length],['LONG',log.filter(x=>x.signal==='LONG').length],['SHORT',log.filter(x=>x.signal==='SHORT').length]]
+  .map(x=>`<div class="st"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
+ $('hist').innerHTML=h.length?h.map(x=>card(x,x.ts===window.lastTs)).join(''):'<p class="mut">Brak historii.</p>';
+}
+
+$('gear').onclick=()=>{const s=$('settings');s.style.display=s.style.display==='block'?'none':'block';
+ $('k_api').value=ls.get('api','');$('k_tg').value=ls.get('tg','');$('k_chat').value=ls.get('chat','');$('k_mult').value=ls.get('mult',20);$('k_ctr').value=ls.get('ctr',1)};
+$('save').onclick=()=>{ls.set('api',$('k_api').value.trim());ls.set('tg',$('k_tg').value.trim());ls.set('chat',$('k_chat').value.trim());
+ ls.set('mult',parseFloat(String($('k_mult').value).replace(',','.'))||20);ls.set('ctr',parseFloat(String($('k_ctr').value).replace(',','.'))||1);
+ $('settings').style.display='none';$('warn').style.display='none'};
+$('clear').onclick=()=>{if(confirm('Wyczyścić historię?')){ls.set('hist',[]);renderAll()}};
+$('pick').onclick=()=>{if(!ls.get('api','')){$('gear').click();return}$('f').click()};
+$('f').onchange=async e=>{
+ const files=Array.from(e.target.files).slice(0,2);if(!files.length)return;
+ $('pick').disabled=true;$('cur').innerHTML='<div class="card">Analizuję…'+(e.target.files.length>2?' (użyto 2 pierwszych screenów)':'')+'</div>';
+ try{
+  const fulls=[],thumbs=[];
+  for(const f of files){fulls.push((await resize(f,1600,.85)).split(',')[1]);thumbs.push(await resize(f,360,.5))}
+  const h=ls.get('hist',[]);
+  const s=validate(await analyze(fulls),h);
+  s.ts=new Date().toISOString().slice(0,19);s.thumbs=thumbs;
+  h.unshift(s);
+  while(h.length&&!ls.set('hist',h.slice(0,30)))h.pop();
+  if(s.valid)telegram(s);
+  window.lastTs=s.ts;$('cur').innerHTML='';renderAll();
+ }catch(err){$('cur').innerHTML='<div class="card no">'+esc(err&&err.message?err.message:'Nie udało się przetworzyć obrazu. Spróbuj inny screen.')+'</div>'}
+ $('pick').disabled=false;e.target.value='';
+};
+if(navigator.storage&&navigator.storage.persist){navigator.storage.persist().catch(()=>{})}
+if(!ls.set('t',1)){$('warn').style.display='block';$('warn').textContent='Przeglądarka blokuje zapis danych (tryb prywatny?). Klucz i historia nie zostaną zapamiętane.'}
+renderAll();
+</script></body></html>

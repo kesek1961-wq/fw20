@@ -121,6 +121,23 @@ details p{margin:6px 0;font-size:14px;color:#c6cfe2}
 .panel .row{display:flex;gap:8px;margin-top:16px}
 .panel .row button{flex:1;border-radius:var(--r-sm);padding:13px;font-weight:800;border:1px solid var(--line);background:var(--raised)}
 .panel .row .ok{background:var(--accent);color:#06101f;border:0}
+
+.add{display:block;width:100%;margin-top:10px;background:transparent;border:1.5px dashed var(--line);
+  color:var(--accent);border-radius:var(--r-lg);padding:14px;font-weight:800;font-size:15px}
+.tools{display:flex;gap:8px;margin-top:10px}
+.tools button{flex:1;background:transparent;border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:9px;font-size:13px;font-weight:700;color:var(--muted)}
+.res{margin-top:10px;background:var(--raised);border-radius:var(--r-sm);padding:10px 12px;font-weight:800;font-size:15px}
+.tag{font-size:11px;font-weight:700;color:var(--accent);border:1px solid var(--line);border-radius:99px;padding:1px 7px;margin-left:6px}
+.note{margin:8px 0 0;font-size:13px;color:#c6cfe2}
+.panel{max-height:92vh;overflow:auto}
+.dirs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dirs button{background:var(--raised);border:1px solid var(--line);border-radius:var(--r-sm);padding:13px;font-weight:800;font-size:16px}
+.dirs button.on[data-dir="LONG"]{background:rgba(45,212,167,.18);border-color:var(--long);color:var(--long)}
+.dirs button.on[data-dir="SHORT"]{background:rgba(255,107,107,.18);border-color:var(--short);color:var(--short)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.panel .merr{color:var(--short);font-size:13px;min-height:18px;margin:10px 0 0}
 </style></head>
 <body>
 <div class="top">
@@ -141,6 +158,7 @@ details p{margin:6px 0;font-size:14px;color:#c6cfe2}
   <input id="f" type="file" accept="image/*" multiple hidden>
 </label>
 <p class="hint">Zaznacz wykres wyższego interwału (np. 1H), a potem niższego (np. 15m). Wyższy daje kierunek, niższy wejście.</p>
+<button class="add" id="add">+ Dodaj wejście ręcznie</button>
 
 <div id="status"></div>
 
@@ -159,6 +177,30 @@ details p{margin:6px 0;font-size:14px;color:#c6cfe2}
     <label for="model">Model</label>
     <input id="model" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
     <div class="row"><button id="cancel">Anuluj</button><button class="ok" id="saveCfg">Zapisz</button></div>
+  </div>
+</div>
+
+<div class="sheet" id="sheet2">
+  <div class="panel" role="dialog" aria-label="Wpis ręczny">
+    <h3 id="mTitle">Nowe wejście</h3>
+    <p>Wpisz poziomy z własnej platformy. RR policzy się samo, gdy podasz SL i TP.</p>
+    <label>Kierunek</label>
+    <div class="dirs" id="dirSeg"><button data-dir="LONG">LONG</button><button data-dir="SHORT">SHORT</button></div>
+    <div class="grid2">
+      <div><label for="mInstr">Instrument</label><input id="mInstr" type="text" placeholder="np. FW20Z2620" autocomplete="off"></div>
+      <div><label for="mInt">Interwał</label><input id="mInt" type="text" placeholder="np. 15m" autocomplete="off"></div>
+    </div>
+    <div class="grid3">
+      <div><label for="mEntry">Wejście</label><input id="mEntry" type="text" inputmode="decimal" autocomplete="off"></div>
+      <div><label for="mSl">SL</label><input id="mSl" type="text" inputmode="decimal" autocomplete="off"></div>
+      <div><label for="mTp">TP</label><input id="mTp" type="text" inputmode="decimal" autocomplete="off"></div>
+    </div>
+    <label for="mExit">Cena wyjścia (gdy pozycja zamknięta)</label>
+    <input id="mExit" type="text" inputmode="decimal" autocomplete="off" placeholder="zostaw puste, jeśli pozycja otwarta">
+    <label for="mNote">Notatka</label>
+    <input id="mNote" type="text" autocomplete="off" placeholder="opcjonalnie">
+    <p class="merr" id="mErr"></p>
+    <div class="row"><button id="mCancel">Anuluj</button><button class="ok" id="mSave">Zapisz</button></div>
   </div>
 </div>
 
@@ -211,10 +253,12 @@ $('saveCfg').onclick=()=>{
 function stats(){
   const real=items.filter(i=>i.d.kierunek==='LONG'||i.d.kierunek==='SHORT');
   const open=items.filter(i=>i.st==='in').length;
-  const tp=items.filter(i=>i.st==='tp'), sl=items.filter(i=>i.st==='sl');
-  const pl=tp.reduce((a,i)=>a+(num(i.d.rr)||0),0)-sl.length;
-  const closed=tp.length+sl.length;
-  const acc=closed?Math.round(tp.length/closed*100)+'%':'–';
+  const closedItems=items.filter(i=>i.st==='tp'||i.st==='sl'||i.st==='man');
+  const rOf=i=>i.st==='tp'?(num(i.d.rr)||0):i.st==='sl'?-1:(i.r!=null?i.r:null);
+  const win=i=>i.st==='tp'||(i.st==='man'&&(i.r!=null?i.r>0:(i.pts||0)>0));
+  const pl=closedItems.reduce((a,i)=>a+(rOf(i)||0),0);
+  const closed=closedItems.length;
+  const acc=closed?Math.round(closedItems.filter(win).length/closed*100)+'%':'–';
   const plTxt=(pl>0?'+':'')+fmt(Math.round(pl*100)/100)+'R';
   const plCls=closed?(pl>=0?'pos':'neg'):'';
   $('stats').innerHTML=
@@ -249,14 +293,22 @@ const SEG=[['in','Wszedłem'],['skip','Bez wejścia'],['tp','TP'],['sl','SL']];
 
 function card(it){
   const d=it.d, k=(d.kierunek==='LONG'||d.kierunek==='SHORT')?d.kierunek:'BRAK';
-  const done=(it.st==='tp'||it.st==='sl'||it.st==='skip')?' done':'';
+  const done=(it.st==='tp'||it.st==='sl'||it.st==='skip'||it.st==='man')?' done':'';
   const seg=k==='BRAK'?'':`<div class="seg">${SEG.map(([v,l])=>
      `<button class="${v}${it.st===v?' on':''}" data-act="st" data-v="${v}" data-id="${it.id}">${l}</button>`).join('')}</div>`;
   const rr=num(d.rr);
+  let res='';
+  if(it.st==='man'&&it.exit!=null){
+    const w=it.r!=null?it.r>0:(it.pts||0)>0;
+    const val=it.r!=null?((it.r>0?'+':'')+fmt(it.r)+'R'):((it.pts>0?'+':'')+fmt(it.pts)+' pkt');
+    res=`<div class="res ${w?'pos':'neg'}">Wyjście ${fmt(it.exit)} · ${val}</div>`;
+  }
+  const tools=`<div class="tools"><button data-act="edit" data-id="${it.id}">Edytuj</button>`+
+    (k!=='BRAK'&&it.st!=='man'?`<button data-act="exit" data-id="${it.id}">Wpisz wyjście</button>`:'')+`</div>`;
   return `<article class="card ${k}${done}">
     <div class="hd">
       <span class="badge">${k}</span>
-      <div class="meta"><b>${esc(d.instrument||'Instrument?')}</b><span>${esc(d.interwal||'')} ${esc(it.time)}</span></div>
+      <div class="meta"><b>${esc(d.instrument||'Instrument?')}${it.manual?'<span class="tag">ręcznie</span>':''}</b><span>${esc(d.interwal||'')} ${esc(it.time)}</span></div>
       <button class="x" data-act="del" data-id="${it.id}" aria-label="Usuń sygnał">×</button>
     </div>
     ${ladder(d)}
@@ -265,12 +317,15 @@ function card(it){
       <div>Pewność<b>${esc(d.pewnosc||'–')}</b></div>
       <div>Wyższy int.<b>${esc(d.wyzszy_interwal||'–')}</b></div>
     </div>
-    <details><summary>Opis analizy</summary>
+    ${res}
+    ${(d.opis_htf||d.opis)?`<details><summary>Opis analizy</summary>
       ${d.opis_htf?`<p>${esc(d.opis_htf)}</p>`:''}
       ${d.opis?`<p>${esc(d.opis)}</p>`:''}
-    </details>
+    </details>`:''}
+    ${d.note?`<p class="note">Notatka: ${esc(d.note)}</p>`:''}
     ${d.uniewaznia?`<p class="inv">Unieważnia: ${esc(d.uniewaznia)}</p>`:''}
     ${seg}
+    ${tools}
   </article>`;
 }
 
@@ -283,7 +338,10 @@ function render(){
 $('list').addEventListener('click',e=>{
   const b=e.target.closest('[data-act]'); if(!b) return;
   const it=items.find(i=>i.id===b.dataset.id); if(!it) return;
-  if(b.dataset.act==='del'){items=items.filter(i=>i!==it)}
+  const a=b.dataset.act;
+  if(a==='edit'){openForm(it.id,false);return}
+  if(a==='exit'){openForm(it.id,true);return}
+  if(a==='del'){items=items.filter(i=>i!==it)}
   else{it.st=(it.st===b.dataset.v)?'new':b.dataset.v}
   save();render();
 });
@@ -348,6 +406,54 @@ $('f').onchange=async e=>{
   }catch(err){
     $('status').innerHTML=`<div class="err">${esc(err.message||err)}<br>Sprawdź klucz API i połączenie, potem spróbuj ponownie.</div>`;
   }
+};
+
+/* ręczne wpisy */
+let editId=null, dir=null;
+const pn=v=>{const x=parseFloat(String(v==null?'':v).replace(/\s/g,'').replace(',','.'));return isNaN(x)?null:x};
+function setDir(v){dir=v;document.querySelectorAll('#dirSeg button').forEach(b=>b.classList.toggle('on',b.dataset.dir===v))}
+document.querySelectorAll('#dirSeg button').forEach(b=>b.onclick=()=>setDir(b.dataset.dir===dir?null:b.dataset.dir));
+function openForm(id,focusExit){
+  editId=id||null;
+  const it=id?items.find(i=>i.id===id):null, d=it?it.d:{};
+  $('mTitle').textContent=it?'Edytuj wpis':'Nowe wejście';
+  setDir(d.kierunek==='LONG'||d.kierunek==='SHORT'?d.kierunek:null);
+  $('mInstr').value=d.instrument||''; $('mInt').value=d.interwal||'';
+  $('mEntry').value=d.entry==null?'':d.entry; $('mSl').value=d.sl==null?'':d.sl; $('mTp').value=d.tp==null?'':d.tp;
+  $('mExit').value=(it&&it.exit!=null)?it.exit:''; $('mNote').value=d.note||'';
+  $('mErr').textContent='';
+  $('sheet2').classList.add('open');
+  if(focusExit) setTimeout(()=>$('mExit').focus(),60);
+}
+function closeForm(){$('sheet2').classList.remove('open')}
+$('add').onclick=()=>openForm(null,false);
+$('mCancel').onclick=closeForm;
+$('sheet2').addEventListener('click',e=>{if(e.target.id==='sheet2')closeForm()});
+$('mSave').onclick=()=>{
+  const e=pn($('mEntry').value), s=pn($('mSl').value), t=pn($('mTp').value), x=pn($('mExit').value);
+  const err=m=>{$('mErr').textContent=m};
+  if(!dir) return err('Wybierz kierunek: LONG lub SHORT.');
+  if(e==null) return err('Wpisz cenę wejścia.');
+  if(s!=null&&(dir==='LONG'?s>=e:s<=e)) return err('SL jest po złej stronie wejścia.');
+  if(t!=null&&(dir==='LONG'?t<=e:t>=e)) return err('TP jest po złej stronie wejścia.');
+  const it=editId?items.find(i=>i.id===editId):null;
+  const d=Object.assign({},it?it.d:{pewnosc:null,wyzszy_interwal:null,opis:'',opis_htf:'',uniewaznia:''},
+    {kierunek:dir,instrument:$('mInstr').value.trim(),interwal:$('mInt').value.trim(),entry:e,sl:s,tp:t,note:$('mNote').value.trim()});
+  if(s!=null&&t!=null) d.rr=Math.round(Math.abs(t-e)/Math.abs(e-s)*100)/100;
+  else if(!it) d.rr=null;
+  const sign=dir==='LONG'?1:-1;
+  let exit=null,pts=null,r=null;
+  if(x!=null){exit=x;pts=Math.round(sign*(x-e)*100)/100;r=(s!=null)?Math.round(sign*(x-e)/Math.abs(e-s)*100)/100:null}
+  if(it){
+    it.d=d;it.exit=exit;it.pts=pts;it.r=r;
+    if(x!=null) it.st='man'; else if(it.st==='man') it.st='in';
+  }else{
+    items.unshift({id:Date.now().toString(36),manual:true,
+      time:new Date().toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}),
+      st:x!=null?'man':'in',d,exit,pts,r});
+    items=items.slice(0,60);
+  }
+  save();render();closeForm();
 };
 render();
 </script></body></html>

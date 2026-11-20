@@ -129,6 +129,7 @@ details p{margin:6px 0;font-size:14px;color:#c6cfe2}
   padding:9px;font-size:13px;font-weight:700;color:var(--muted)}
 .res{margin-top:10px;background:var(--raised);border-radius:var(--r-sm);padding:10px 12px;font-weight:800;font-size:15px}
 .tag{font-size:11px;font-weight:700;color:var(--accent);border:1px solid var(--line);border-radius:99px;padding:1px 7px;margin-left:6px}
+.plan{margin-top:10px;background:rgba(245,185,74,.1);border:1px solid rgba(245,185,74,.35);border-radius:var(--r-sm);padding:10px 12px;font-size:14px;color:#f3d9a4}
 .note{margin:8px 0 0;font-size:13px;color:#c6cfe2}
 .panel{max-height:92vh;overflow:auto}
 .dirs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -208,7 +209,7 @@ details p{margin:6px 0;font-size:14px;color:#c6cfe2}
 const KEY='fw20_items_v2', KEY_API='fw20_key', KEY_MODEL='fw20_model';
 const DEFAULT_MODEL='claude-sonnet-4-5';
 const PROMPT=`Jesteś asystentem analizy technicznej. Dostajesz 1-2 screeny wykresów
-(jeśli 2: pierwszy = wyższy interwał, drugi = niższy interwał wejścia).
+(jeśli 2: kolejność może być dowolna - rozpoznaj interwał każdego screena z podpisu na wykresie; wyższy interwał daje kierunek, niższy służy do wejścia).
 Odczytaj instrument, interwał i poziomy cen z obrazu. Nie zgaduj - jeśli czegoś
 nie widać, wpisz null. Odpowiedz WYŁĄCZNIE JSON-em:
 {
@@ -219,9 +220,10 @@ nie widać, wpisz null. Odpowiedz WYŁĄCZNIE JSON-em:
  "wyzszy_interwal": "wzrostowy"|"spadkowy"|"boczny"|null,
  "opis_htf": "krótko, po polsku",
  "opis": "krótko, po polsku - struktura, poziomy, scenariusz",
- "uniewaznia": "warunek unieważnienia setupu"
+ "uniewaznia": "warunek unieważnienia setupu",
+ "plan": "string|null"
 }
-Jeśli brak czytelnego setupu, daj kierunek BRAK. To analiza techniczna z obrazu,
+Kierunek BRAK dawaj tylko wtedy, gdy rzeczywiście nie ma setupu. Jeśli wejście teraz byłoby spóźnione (np. po silnym ruchu impulsowym), ale widać sensowny scenariusz, daj BRAK i w polu plan opisz warunkowy plan po polsku z konkretnymi poziomami: strefa wejścia, SL, TP i warunek (np. po cofnięciu do ...). W opisie wymień kluczowe poziomy odczytane z osi cen. Jeśli planu nie ma, plan = null. To analiza techniczna z obrazu,
 nie rekomendacja inwestycyjna.`;
 
 const $=id=>document.getElementById(id);
@@ -322,6 +324,7 @@ function card(it){
       ${d.opis_htf?`<p>${esc(d.opis_htf)}</p>`:''}
       ${d.opis?`<p>${esc(d.opis)}</p>`:''}
     </details>`:''}
+    ${d.plan?`<div class="plan"><b>Plan:</b> ${esc(d.plan)}</div>`:''}
     ${d.note?`<p class="note">Notatka: ${esc(d.note)}</p>`:''}
     ${d.uniewaznia?`<p class="inv">Unieważnia: ${esc(d.uniewaznia)}</p>`:''}
     ${seg}
